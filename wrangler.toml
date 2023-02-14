@@ -1,3 +1,6 @@
 name = "getcaptcha"
 main = "src/index.ts"
 compatibility_date = "2023-02-14"
+
+[vars]
+API_KEY = "sv_du"
