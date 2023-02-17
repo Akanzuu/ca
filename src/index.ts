@@ -28,7 +28,21 @@ async function login(username: string, password: string, csrfToken?: string, cap
 }
 
 async function doPostToken(env: Env, csrfToken: string, captchaID: string, captchaToken: string) {
-	
+	let res = await login(env.username, env.password, csrfToken, captchaID, captchaToken);
+	let resText = await res.text();
+	let resJSON = JSON.parse(resText);
+	if(resJSON.errors[0].message === "Token Validation Failed") {
+		while(true) {
+			csrfToken = res.headers.get("x-csrf-token");
+			res = await login(env.username, env.password, csrfToken);
+			resText = await res.text();
+			resJSON = JSON.parse(resText);
+			if(resJSON.errors[0].message !== "Token Validation Failed") break;
+		}
+		return resText
+	} else {
+		return resText
+	}
 }
 
 export default {
@@ -38,6 +52,7 @@ export default {
 			if(key !== env.API_KEY) return new Response("Invalid API key", {status: 403});
 			if(request.headers.get("csrfToken")) {
 				let cookie = await doPostToken(env, request.headers.get("csrfToken"), request.headers.get("captchaID"), request.headers.get("captchaToken"));
+				return new Response(cookie);
 			}
 			let res = await login(env.username, env.password);
 			let resText = await res.text();
@@ -68,11 +83,12 @@ export default {
 				userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0"
 			})
 			let response = JSON.stringify({
-				htmlFileContent: `<!DOCTYPE html>\n<iframe src="${session.getEmbedUrl()}" height="200" width="300" title="Captcha"></iframe>`,
+				htmlFileContent: `<!DOCTYPE html>\n<iframe src="${session.getEmbedUrl()}" height="290" width="302"></iframe>`,
 				csrfToken: csrfToken,
 				captchaID: captchaID,
 				captchaToken: captchaToken.token
 			});
+			console.log(JSON.parse(response).htmlFileContent)
 			return new Response(response);
 		} catch(e) {
 			return new Response(`Something went wrong: ${e}. Please report this on the Github`, {status: 500})
