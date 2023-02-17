@@ -12,6 +12,6 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
-    "funcaptcha": "^1.0.33"
+    "crypto-browserify": "^3.12.0"
   }
 }

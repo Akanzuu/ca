@@ -1,4 +1,5 @@
-import * as fun from 'funcaptcha';
+import getToken from "./CaptchaStuff/getToken"
+import { Session } from "./CaptchaStuff/Session";
 
 export interface Env {
 	API_KEY: string,
@@ -52,7 +53,7 @@ export default {
 			if(!fieldData) return new Response(`A response that wasn't a captcha response was recieved. The API response is below\n\n${resText}`, {status: 403});
 			let captchaID = fieldData.unifiedCaptchaId;
 			let dataBlob = fieldData.dxBlob
-			let captchaToken = await fun.getToken({
+			let captchaToken = await getToken({
 				pkey: CAPTCHA_KEY,
 				surl: "https://roblox-api.arkoselabs.com",
 				data: {
@@ -63,11 +64,11 @@ export default {
 				},
 				site: "https://www.roblox.com"
 			});
-			let session = new fun.Session(captchaToken, {
+			let session = new Session(captchaToken, {
 				userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0"
 			})
 			let response = JSON.stringify({
-				htmlFileContent: `<iframe src="${session.getEmbedUrl()}" height="200" width="300" title="Captcha"></iframe>`,
+				htmlFileContent: `<!DOCTYPE html>\n<iframe src="${session.getEmbedUrl()}" height="200" width="300" title="Captcha"></iframe>`,
 				csrfToken: csrfToken,
 				captchaID: captchaID,
 				captchaToken: captchaToken.token
