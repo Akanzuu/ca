@@ -34,7 +34,7 @@ async function doPostToken(env: Env, csrfToken: string, captchaID: string, captc
 	if(resJSON.errors[0].message === "Token Validation Failed") {
 		while(true) {
 			csrfToken = res.headers.get("x-csrf-token");
-			res = await login(env.username, env.password, csrfToken);
+			res = await login(env.username, env.password, csrfToken, captchaID, captchaToken);
 			resText = await res.text();
 			resJSON = JSON.parse(resText);
 			if(resJSON.errors[0].message !== "Token Validation Failed") break;
