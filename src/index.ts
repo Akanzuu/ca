@@ -45,6 +45,10 @@ async function doPostToken(env: Env, csrfToken: string, captchaID: string, captc
 	}
 }
 
+function timeout(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
 		try {
@@ -68,6 +72,7 @@ export default {
 			if(!fieldData) return new Response(`A response that wasn't a captcha response was recieved. The API response is below\n\n${resText}`, {status: 403});
 			let captchaID = fieldData.unifiedCaptchaId;
 			let dataBlob = fieldData.dxBlob
+			await timeout(5000);
 			let captchaToken = await getToken({
 				pkey: CAPTCHA_KEY,
 				surl: "https://roblox-api.arkoselabs.com",
