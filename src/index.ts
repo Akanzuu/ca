@@ -14,7 +14,7 @@ async function login(username: string, password: string, csrfToken?: string, cap
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0",
+			"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.1",
 			"X-CSRF-TOKEN": csrfToken || "",
 		},
 		body: JSON.stringify({
@@ -80,12 +80,13 @@ export default {
 					blob: dataBlob
 				},
 				headers: {
-					"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0"
+					"user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.1"
 				},
-				site: "https://www.roblox.com"
+				site: "https://www.roblox.com",
+				location: "https://www.roblox.com"
 			});
 			let session = new Session(captchaToken, {
-				userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0"
+				userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.1"
 			})
 			let response = JSON.stringify({
 				htmlFileContent: `<!DOCTYPE html>\n<iframe src="${session.getEmbedUrl()}" height="290" width="302"></iframe>`,
