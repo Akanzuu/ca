@@ -1,13 +1,57 @@
-// Code taken from https://github.com/noahcoolboy/funcaptcha
-// Modified to support CF workers
-
 import fingerprint from "./fingerprint";
 import murmur from "./murmur";
 import crypt from "./crypt";
 
-export const DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36";
+interface TimestampData {
+    cookie: string;
+    value: string;
+}
 
-export function constructFormData(data: {}): string {
+const DEFAULT_USER_AGENT =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36";
+
+let apiBreakers = {
+    default: (c) => {
+        return {
+            px: (c[0] / 300).toFixed(2),
+            py: (c[1] / 200).toFixed(2),
+            x: c[0],
+            y: c[1],
+        };
+    },
+    method_1: (c) => {
+        return { x: c[1], y: c[0] };
+    },
+    method_2: (c) => {
+        return { x: c[0], y: (c[1] + c[0]) * c[0] };
+    },
+    method_3: (c) => {
+        return { a: c[0], b: c[1] };
+    },
+    method_4: (c) => {
+        return [c[0], c[1]];
+    },
+    method_5: (c) => {
+        return [c[1], c[0]].map((v) => Math.sqrt(v));
+    },
+};
+
+function tileToLoc(tile: number): number[] {
+    return [
+        (tile % 3) * 100 +
+            (tile % 3) * 3 +
+            3 +
+            10 +
+            Math.floor(Math.random() * 80),
+        Math.floor(tile / 3) * 100 +
+            Math.floor(tile / 3) * 3 +
+            3 +
+            10 +
+            Math.floor(Math.random() * 80),
+    ];
+}
+
+function constructFormData(data: {}): string {
     return Object.keys(data)
         .filter((v) => data[v] !== undefined)
         .map((k) => `${k}=${encodeURIComponent(data[k])}`)
@@ -21,7 +65,14 @@ function random(): string {
         .join("");
 }
 
-export function getBda(userAgent: string, referer?: string, location?: string): string {
+function getTimestamp(): TimestampData {
+    const time = (new Date()).getTime().toString()
+    const value = `${time.substring(0, 7)}00${time.substring(7, 13)}`
+
+    return { cookie: `timestamp=${value};path=/;secure;samesite=none`, value }
+}
+
+function getBda(userAgent: string, referer?: string, location?: string): string {
     let fp = fingerprint.getFingerprint();
     let fe = fingerprint.prepareFe(fp);
 
@@ -45,7 +96,7 @@ export function getBda(userAgent: string, referer?: string, location?: string): 
                 },
                 {
                     "key": "webgl_extensions_hash",
-                    "value": "58a5a04a5bef1a78fa88d5c5098bd237"
+                    "value": random()
                 },
                 {
                     "key": "webgl_renderer",
@@ -113,7 +164,7 @@ export function getBda(userAgent: string, referer?: string, location?: string): 
                 },
                 {
                     "key": "webgl_hash_webgl",
-                    "value": "c96a5728a321427881c51f4c17406cc2"
+                    "value": random()
                 },
                 {
                     "key": "user_agent_data_brands",
@@ -284,3 +335,12 @@ export function getBda(userAgent: string, referer?: string, location?: string): 
     let encrypted = crypt.encrypt(s, key);
     return Buffer.from(encrypted).toString("base64");
 }
+
+export default {
+    DEFAULT_USER_AGENT,
+    tileToLoc,
+    constructFormData,
+    getBda,
+    apiBreakers,
+    getTimestamp,
+};
