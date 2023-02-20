@@ -1,7 +1,7 @@
 // Code taken from https://github.com/noahcoolboy/funcaptcha
 
-import * as util from './internal/util';
-import { GetTokenResult } from './getToken';
+import { GetTokenResult } from "./getToken";
+import util from "./internal/util";
 
 export interface TokenInfo {
     token: string;

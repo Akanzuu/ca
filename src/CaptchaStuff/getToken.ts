@@ -1,9 +1,8 @@
 // Code taken from https://github.com/noahcoolboy/funcaptcha
-// Modified to support CF workers
 
-import * as util from './internal/util';
+import util from "./internal/util";
 
-interface GetTokenOptions {
+export interface GetTokenOptions {
     pkey: string;
     // Service URL
     surl?: string;
@@ -33,31 +32,32 @@ export interface GetTokenResult {
     token: string;
 }
 
-async function getToken(options: GetTokenOptions): Promise<GetTokenResult> {
+export async function getToken(
+    options: GetTokenOptions
+): Promise<GetTokenResult> {
     options = {
         surl: "https://client-api.arkoselabs.com",
         data: {},
         ...options,
     };
 
-    if(!options.headers) {
+    if (!options.headers)
         options.headers = { "User-Agent": util.DEFAULT_USER_AGENT };
-    } else if(!Object.keys(options.headers).map(v => v.toLowerCase()).includes("user-agent")) {
+    else if (!Object.keys(options.headers).map(v => v.toLowerCase()).includes("user-agent"))
         options.headers["User-Agent"] = util.DEFAULT_USER_AGENT;
-    }
 
     options.headers["Accept-Language"] = "en-US,en;q=0.9";
     options.headers["Sec-Fetch-Site"] = "cross-site";
     options.headers["Accept"] = "*/*";
     options.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8";
-    options.headers["sec-fetch-mode"] = "cors";
+    options.headers["sec-fetch-mode"] = "cors"
 
-    if(options.site) {
-        options.headers["Origin"] = options.site;
-        options.headers["Referer"] = `${options.site}/`;
+    if (options.site) {
+        options.headers["Origin"] = options.site
+        options.headers["Referer"] = `${options.site}/`
     }
 
-    let ua = options.headers[Object.keys(options.headers).find(v => v.toLowerCase() == "user-agent")];
+    let ua = options.headers[Object.keys(options.headers).find(v => v.toLowerCase() == "user-agent")]
     let res = await fetch(`${options.surl}/fc/gt2/public_key/${options.pkey}`, {
         method: "POST",
         headers: options.headers,
@@ -73,5 +73,3 @@ async function getToken(options: GetTokenOptions): Promise<GetTokenResult> {
     });
     return JSON.parse(await res.text());
 }
-
-export default getToken;

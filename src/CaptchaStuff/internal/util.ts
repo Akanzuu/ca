@@ -1,3 +1,5 @@
+// Code taken from https://github.com/noahcoolboy/funcaptcha
+
 import fingerprint from "./fingerprint";
 import murmur from "./murmur";
 import crypt from "./crypt";
